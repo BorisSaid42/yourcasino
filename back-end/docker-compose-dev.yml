@@ -1,0 +1,46 @@
+services:
+  db.yourcasino.back-end:
+    container_name: db.yourcasino.back-end
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      - network.yourcasino.back-end
+    volumes:
+      - dbdata.yourcasino.back-end:/var/lib/postgresql/data
+    ports:
+      - ${DB_PORT}:5432
+  redis.yourcasino.back-end:
+    container_name: redis.yourcasino.back-end
+    image: redis:7
+    restart: always
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    networks:
+      - network.yourcasino.back-end
+    volumes:
+      - redisdata.yourcasino.back-end:/data
+    command: >
+      sh -c "
+        mkdir -p /usr/local/etc/redis;
+        echo 'port 6379' > /usr/local/etc/redis/redis.conf;
+        if [ -n \"${REDIS_PASSWORD}\" ]; then
+          echo 'requirepass ${REDIS_PASSWORD}' >> /usr/local/etc/redis/redis.conf;
+        fi
+        redis-server /usr/local/etc/redis/redis.conf
+      "
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+
+volumes:
+  dbdata.yourcasino.back-end:
+    driver: local
+  redisdata.yourcasino.back-end:
+    driver: local
+
+networks:
+  network.yourcasino.back-end:
+    name: network.yourcasino.back-end
