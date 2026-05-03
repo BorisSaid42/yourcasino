@@ -41,7 +41,7 @@ export class MailService {
     const mailOptions = this.createMailOptions(email);
     const template = emailChangePassword(url, this.configService.getAppUrl());
 
-    const { html, errors } = mjml2html(template);
+    const { html, errors } = await mjml2html(template);
 
     if (errors.length) {
       console.error('MJML compilation errors:', errors);
@@ -58,7 +58,7 @@ export class MailService {
     const mailOptions = this.createMailOptions(email);
     const template = emailVerification(url, this.configService.getAppUrl());
 
-    const { html, errors } = mjml2html(template);
+    const { html, errors } = await mjml2html(template);
 
     if (errors.length) {
       console.error('MJML compilation errors:', errors);
